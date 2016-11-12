@@ -104,6 +104,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getConstructorStart;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEnumsConstructor;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEnumsOfValueMethod;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEqualsMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEqualsMethodClose;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getEqualsMethodOpen;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getFromStringMethodClose;
@@ -111,6 +112,7 @@ import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetter;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterForClass;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getGetterString;
+import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethod;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethodClose;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getHashCodeMethodOpen;
 import static org.onosproject.yangutils.translator.tojava.utils.MethodsGenerator.getInterfaceLeafIdEnumSignature;
@@ -162,6 +164,8 @@ import static org.onosproject.yangutils.utils.UtilConstants.EVENT_SUBJECT_NAME_S
 import static org.onosproject.yangutils.utils.UtilConstants.IMPL_CLASS;
 import static org.onosproject.yangutils.utils.UtilConstants.INT;
 import static org.onosproject.yangutils.utils.UtilConstants.INTERFACE;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_OBJECTS_IMPORT_CLASS;
+import static org.onosproject.yangutils.utils.UtilConstants.JAVA_UTIL_PKG;
 import static org.onosproject.yangutils.utils.UtilConstants.KEYS;
 import static org.onosproject.yangutils.utils.UtilConstants.NEW_LINE;
 import static org.onosproject.yangutils.utils.UtilConstants.OP_PARAM;
@@ -506,6 +510,9 @@ public final class JavaFileGenerator {
             }
         }
 
+        imports.add(getImportString(JAVA_UTIL_PKG,
+                                    JAVA_UTIL_OBJECTS_IMPORT_CLASS));
+
         initiateJavaFileGeneration(file, GENERATE_KEY_CLASS, imports, curNode,
                                    className);
         String pkg = null;
@@ -535,6 +542,22 @@ public final class JavaFileGenerator {
                     attr, className, GENERATE_EVENT_SUBJECT_CLASS));
             insertDataIntoJavaFile(file, NEW_LINE);
         }
+
+        insertDataIntoJavaFile(file, getHashCodeMethodOpen());
+        StringBuilder builder = new StringBuilder();
+        for (JavaAttributeInfo att : attrs) {
+            builder.append(getHashCodeMethod(att));
+        }
+        insertDataIntoJavaFile(file, getHashCodeMethodClose(builder.toString()));
+
+        insertDataIntoJavaFile(file, getEqualsMethodOpen(className));
+        StringBuilder builder2 = new StringBuilder();
+        for (JavaAttributeInfo att : attrs) {
+            builder2.append(getEqualsMethod(att)).append(NEW_LINE);
+        }
+        insertDataIntoJavaFile(file, getEqualsMethodClose(builder2.toString()));
+
+
         insertDataIntoJavaFile(file, getCompareToForKeyClass(attrs, className));
 
         insertDataIntoJavaFile(file, CLOSE_CURLY_BRACKET);
